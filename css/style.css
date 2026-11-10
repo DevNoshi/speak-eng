@@ -34,3 +34,5 @@ nav button{flex:1;background:none;border:0;color:var(--mut);font:600 12px inheri
 nav button[aria-current="page"]{color:var(--ac);background:var(--acs)}
 .ctl{display:flex;gap:8px;align-items:center;margin-bottom:14px;font-size:12px;color:var(--mut)}
 button:focus-visible{outline:3px solid var(--ac);outline-offset:2px}
+main{padding-top:56px}
+#theme{position:fixed;top:calc(12px + env(safe-area-inset-top,0px));right:12px;z-index:5}

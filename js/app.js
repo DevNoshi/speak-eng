@@ -13,9 +13,7 @@ function sv(){try{localStorage.setItem(K,JSON.stringify(P))}catch(e){}}
 function gain(x){P.xp+=x;if(P.last!==td()){P.streak=P.last===td(1)?P.streak+1:1;P.last=td()}sv()}
 function ok(id){return P.done[id]>=60}
 function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/"/g,"&quot;")}
-function voice(){var v=speechSynthesis.getVoices().filter(function(x){return /^en[-_]US/i.test(x.lang)});return v.filter(function(x){return /google|natural|samantha|aaron|siri/i.test(x.name)})[0]||v[0]||null}
-function say(t,n){return new Promise(function(res){if(!("speechSynthesis" in window)){alert("Seu navegador não tem voz em inglês.");return res()}
-speechSynthesis.cancel();var u=new SpeechSynthesisUtterance(t);u.lang="en-US";var v=voice();if(v)u.voice=v;u.rate=S.slow?.65:.95;u.onend=u.onerror=function(){res()};speechSynthesis.speak(u);if(n){P.day.plays++;sv()}})}
+function say(t,n){if(n){P.day.plays++;sv()}return Snd.say(t,S.slow)}
 function mk(id){var it=LS[id].i,a=it.slice().sort(function(){return Math.random()-.5}).slice(0,5);
 return a.map(function(c){var o=[c];while(o.length<3){var r=it[Math.floor(Math.random()*it.length)];if(o.indexOf(r)<0)o.push(r)}return{c:c,o:o.sort(function(){return Math.random()-.5}),a:null}})}
 function nextL(){for(var m=0;m<M.length;m++)for(var j=0;j<M[m].l.length;j++)if(!ok(M[m].l[j]))return M[m].l[j];return null}
@@ -53,18 +51,19 @@ return h+'<div class="q"><div class="w">'+S.sc+' de '+S.qs.length+' acertos</div
 function view(){var h=S.v=="home"?home():S.v=="goals"?goals():lesson(LS[S.id]);$("app").innerHTML=h;
 $("stats").innerHTML='<span class="pill">🔥 '+P.streak+'</span><span class="pill">⭐ '+P.xp+'</span>';
 var cur=S.v=="goals"?"goals":S.id=="mix"&&S.v=="lesson"?"mix":"home";
-document.querySelectorAll("nav button").forEach(function(b){b.setAttribute("aria-current",b.dataset.t==cur?"page":"false")})}
+document.querySelectorAll("nav button").forEach(function(b){b.setAttribute("aria-current",b.dataset.t==cur?"page":"false")});
+if(S.v=="lesson"&&S.st=="learn"&&S.id!="mix")Snd.preload(LS[S.id].i.map(function(p){return p[0]}),S.slow)}
 function startQ(){S.qs=mk(S.id);S.qi=0;S.sc=0;S.st="quiz"}
 document.addEventListener("click",function(e){var el=e.target.closest("[data-a],[data-t]");if(!el)return;
-if("speechSynthesis" in window&&(el.dataset.t||el.dataset.a=="home"||el.dataset.a=="open"))speechSynthesis.cancel();
+if(el.dataset.t||/^(home|open|line|say|all|quiz)$/.test(el.dataset.a)){Snd.stop();if(!/^(line|all)$/.test(el.dataset.a))S.play=-1}
 if(el.dataset.t){var t=el.dataset.t;if(t=="mix"){S.v="lesson";S.id="mix";startQ()}else S.v=t;return view()}
 var a=el.dataset.a,v=el.dataset.v;
 if(a=="open"){S.v="lesson";S.id=v;S.st="learn"}
 else if(a=="home"){S.v="home"}
 else if(a=="slow"){S.slow=!S.slow}
 else if(a=="say"){say(v,true);return view()}
-else if(a=="line"){S.play=+v;view();say(LS[S.id].d[+v][1],true).then(function(){S.play=-1;view()});return}
-else if(a=="all"){(async function(){var d=LS[S.id].d;for(var i=0;i<d.length;i++){S.play=i;view();await say(d[i][1],false)}S.play=-1;P.day.plays+=d.length;sv();view()})();return}
+else if(a=="line"){var i0=+v,g0=Snd.gen();S.play=i0;view();say(LS[S.id].d[i0][1],true).then(function(){if(Snd.gen()===g0&&S.play===i0){S.play=-1;view()}});return}
+else if(a=="all"){(async function(){var d=LS[S.id].d,g=Snd.gen();for(var i=0;i<d.length;i++){S.play=i;view();await say(d[i][1],false);if(g!==Snd.gen())return}S.play=-1;P.day.plays+=d.length;sv();view()})();return}
 else if(a=="exp"){var b=new Blob([JSON.stringify({app:"speak-daily",v:1,done:P.done,xp:P.xp,streak:P.streak,last:P.last,exportedAt:td()})],{type:"application/json"}),l=document.createElement("a");l.href=URL.createObjectURL(b);l.download="speak-daily-progresso-"+td()+".json";document.body.appendChild(l);l.click();l.remove();S.msg="Arquivo salvo na sua pasta de downloads."}
 else if(a=="imp"){$("imf").click();return}
 else if(a=="inst"){if(dp){dp.prompt();dp=null}}

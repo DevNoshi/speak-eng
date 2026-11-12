@@ -2,6 +2,21 @@
 
 Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/).
 
+## [0.6.0] - 2026-11-12
+### Adicionado
+- Áudio com vozes neurais em MP3 (`audio/` e `audio/slow/`), gerado por `tools/gerar-audio.py`.
+- Nas conversas, a pessoa A e a pessoa B têm vozes diferentes.
+- Pré-carregamento dos áudios da lição aberta e cache offline dos MP3 (`speakdaily-audio-v1`).
+
+### Alterado
+- Voz de reserva do navegador: escolhe a melhor voz en-US disponível (Natural, Premium, Google), espera a lista de vozes carregar e troca o apóstrofo curvo por reto.
+- "Voz devagar" da reserva de .65 para .75.
+- Cache do service worker: `speakdaily-v5`.
+
+### Corrigido
+- "Ouvir tudo" continuava tocando depois de sair da lição.
+- Realce da frase sumia ao tocar outra frase durante o áudio.
+
 ## [0.5.0] - 2026-11-10
 ### Adicionado
 - Pedido de armazenamento persistente ao navegador para proteger o progresso.
